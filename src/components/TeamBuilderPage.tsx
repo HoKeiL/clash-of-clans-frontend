@@ -1,12 +1,21 @@
 import { Select } from "@chakra-ui/react";
-export function TeamBuilderPage(): JSX.Element {
+import { ReceivedData } from "./Tabs";
+
+export interface teamBuilderProps {
+    teamOptions: ReceivedData[];
+}
+
+export function TeamBuilderPage({
+    teamOptions,
+}: teamBuilderProps): JSX.Element {
     return (
         <div>
-            <Select>
-                <option value="option1">Team 1</option>
-                <option value="option2">Team 2</option>
-                <option value="option3">Team 3</option>
-                <option value="option4">Team 4</option>
+            <Select placeholder="Select teams">
+                {teamOptions.map((team) => (
+                    <option key={team.id} value={`option${team.id}`}>
+                        {team.teamname}
+                    </option>
+                ))}
             </Select>
         </div>
     );

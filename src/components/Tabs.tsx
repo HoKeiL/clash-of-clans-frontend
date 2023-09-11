@@ -2,8 +2,21 @@ import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import { LandingPage } from "./LandingPage";
 import { TeamBuilderPage } from "./TeamBuilderPage";
 import { ImportTeamsPage } from "./ImportTeamsPage";
+import { useState } from "react";
+export interface ReceivedData {
+    id: number;
+    teamname: string;
+    teamcaptain: string;
+    teamplayer1: string;
+    teamplayer2: string;
+    teamplayer3: string;
+    teamplayer4: string;
+    teamplayer5: string;
+    teamplayer6: string;
+}
 
 export function TabsView(): JSX.Element {
+    const [teamOptions, setTeamOptions] = useState<ReceivedData[]>([]);
     return (
         <div>
             <Tabs>
@@ -19,10 +32,16 @@ export function TabsView(): JSX.Element {
                         <LandingPage />
                     </TabPanel>
                     <TabPanel>
-                        <ImportTeamsPage />
+                        <ImportTeamsPage
+                            teamOptions={teamOptions}
+                            setTeamOptions={setTeamOptions}
+                        />
                     </TabPanel>
                     <TabPanel>
-                        <TeamBuilderPage />
+                        <TeamBuilderPage
+                            teamOptions={teamOptions}
+                            setTeamOptions={setTeamOptions}
+                        />
                     </TabPanel>
                     <TabPanel>
                         <p>three!</p>
