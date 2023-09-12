@@ -17,9 +17,10 @@ export interface ReceivedData {
 
 export function TabsView(): JSX.Element {
     const [teamOptions, setTeamOptions] = useState<ReceivedData[]>([]);
+
     return (
         <div>
-            <Tabs>
+            <Tabs size="md">
                 <TabList>
                     <Tab>Home</Tab>
                     <Tab>Import teams</Tab>
@@ -38,10 +39,7 @@ export function TabsView(): JSX.Element {
                         />
                     </TabPanel>
                     <TabPanel>
-                        <TeamBuilderPage
-                            teamOptions={teamOptions}
-                            setTeamOptions={setTeamOptions}
-                        />
+                        <TeamBuilderPage teamOptions={teamOptions} />
                     </TabPanel>
                     <TabPanel>
                         <p>three!</p>
