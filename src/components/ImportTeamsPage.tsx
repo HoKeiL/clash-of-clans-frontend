@@ -46,7 +46,7 @@ export function ImportTeamsPage({
 
     const [isClicked, setIsClicked] = useState(false);
 
-    const changeHandler = (event) => {
+    function handleUploadCSV(event) {
         // Passing file data (event.target.files[0]) to parse using Papa.parse
         Papa.parse(event.target.files[0], {
             header: true,
@@ -68,7 +68,7 @@ export function ImportTeamsPage({
                 setValues(valuesArray);
             },
         });
-    };
+    }
 
     useEffect(() => {
         fetchAllTeams().then((uploadedTeams) => setTeamOptions(uploadedTeams));
@@ -112,7 +112,7 @@ export function ImportTeamsPage({
             <Input
                 type="file"
                 accept=".csv"
-                onChange={changeHandler}
+                onChange={handleUploadCSV}
                 margin={"1em"}
                 variant="flushed"
             />
@@ -162,15 +162,17 @@ export function ImportTeamsPage({
                     <ListItem key={team.id}>{team.teamname}</ListItem>
                 ))}
             </List>
-            <Button
-                margin={"1em"}
-                onClick={handleDeleteTeams}
-                isLoading={isClicked}
-                loadingText={isClicked && "Deleting"}
-                variant={isClicked ? "outline" : "solid"}
-            >
-                Delete
-            </Button>
+            {teamOptions.length > 0 && (
+                <Button
+                    margin={"1em"}
+                    onClick={handleDeleteTeams}
+                    isLoading={isClicked}
+                    loadingText={isClicked && "Deleting"}
+                    variant={isClicked ? "outline" : "solid"}
+                >
+                    Delete
+                </Button>
+            )}
         </div>
     );
 }
