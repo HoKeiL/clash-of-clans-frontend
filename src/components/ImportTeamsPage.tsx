@@ -17,8 +17,8 @@ import axios from "axios";
 import Papa from "papaparse";
 import { useEffect, useState } from "react";
 import { baseUrl } from "../Utils/baseURL";
-import { ReceivedData } from "./Tabs";
 import { fetchAllTeams } from "../fetchAllTeams";
+import { ReceivedData } from "./Tabs";
 
 interface Data {
     teamname: string;
@@ -40,9 +40,9 @@ export function ImportTeamsPage({
     setTeamOptions,
 }: importTeamViewProps): JSX.Element {
     //State to store table Column name
-    const [tableRows, setTableRows] = useState<string[]>([]);
+    const [columnName, setColumnName] = useState<string[]>([]);
     //State to store the values
-    const [values, setValues] = useState<string[]>([]);
+    const [allTeams, setAllTeams] = useState<string[]>([]);
 
     const [isClicked, setIsClicked] = useState(false);
 
@@ -52,83 +52,76 @@ export function ImportTeamsPage({
             header: true,
             skipEmptyLines: true,
             complete: function (results: Papa.ParseResult<[Data]>) {
-                const rowsArray: string[] = [];
-                const valuesArray: string[] = [];
+                const columnNameArray: string[] = [];
+                const teamsArray: string[] = [];
 
                 // Iterating data to get column name and their values
                 results.data.map((d) => {
-                    rowsArray.push(Object.keys(d));
-                    valuesArray.push(Object.values(d));
+                    columnNameArray.push(Object.keys(d));
+                    teamsArray.push(Object.values(d));
                 });
 
                 // Filtered Column Names
-                setTableRows(rowsArray[0]);
+                setColumnName(columnNameArray[0]);
 
                 // Filtered Values
-                setValues(valuesArray);
+                setAllTeams(teamsArray);
             },
         });
     }
 
     useEffect(() => {
         fetchAllTeams().then((uploadedTeams) => setTeamOptions(uploadedTeams));
-    }, [isClicked === true]);
+    }, [isClicked === true, setTeamOptions]);
 
-    async function handleSumbitTeams() {
+    async function handleSumbitAllTeam() {
         setIsClicked(true);
-        await addNewTeams();
+        for (let i = 0; i < allTeams.length; i++) {
+            await axios.post(`${baseUrl}/teams`, generateTeam(i));
+        }
         setIsClicked(false);
     }
 
-    async function addNewTeams() {
-        for (let i = 0; i < values.length; i++) {
-            await axios.post(`${baseUrl}/teams`, generateTeams(i));
-        }
-    }
-    function generateTeams(i: number) {
+    function generateTeam(i: number) {
         return {
-            teamname: values[i][0],
-            teamcaptain: values[i][1],
-            teamplayer1: values[i][2],
-            teamplayer2: values[i][3],
-            teamplayer3: values[i][4],
-            teamplayer4: values[i][5],
-            teamplayer5: values[i][6],
-            teamplayer6: values[i][7],
+            teamname: allTeams[i][0],
+            teamcaptain: allTeams[i][1],
+            teamplayer1: allTeams[i][2],
+            teamplayer2: allTeams[i][3],
+            teamplayer3: allTeams[i][4],
+            teamplayer4: allTeams[i][5],
+            teamplayer5: allTeams[i][6],
+            teamplayer6: allTeams[i][7],
         };
     }
 
-    async function handleDeleteTeams() {
+    async function handleDeleteAllTeams() {
         setIsClicked(true);
-        await deleteTeams();
+        await axios.delete(`${baseUrl}/teams`);
         setIsClicked(false);
     }
-    async function deleteTeams() {
-        await axios.delete(`${baseUrl}/teams`);
-    }
-
     return (
         <div>
             <Input
                 type="file"
                 accept=".csv"
-                onChange={handleUploadCSV}
+                onChange={() => handleUploadCSV}
                 margin={"1em"}
                 variant="flushed"
             />
-            {values.length > 0 && (
+            {allTeams.length > 0 && (
                 <div>
                     <TableContainer marginTop={"1em"}>
                         <Table variant="simple">
                             <Thead>
                                 <Tr>
-                                    {tableRows.map((rows, index) => {
+                                    {columnName.map((rows, index) => {
                                         return <Th key={index}>{rows}</Th>;
                                     })}
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                {values.map((value, index) => {
+                                {allTeams.map((value, index) => {
                                     return (
                                         <Tr key={index}>
                                             {value.map((rowValues, index) => {
@@ -147,7 +140,7 @@ export function ImportTeamsPage({
                     <Button
                         margin={"1em"}
                         rightIcon={<ArrowForwardIcon />}
-                        onClick={handleSumbitTeams}
+                        onClick={() => handleSumbitAllTeam}
                         isLoading={isClicked}
                         loadingText={isClicked && "Submitting"}
                         variant={isClicked ? "outline" : "solid"}
@@ -165,7 +158,7 @@ export function ImportTeamsPage({
             {teamOptions.length > 0 && (
                 <Button
                     margin={"1em"}
-                    onClick={handleDeleteTeams}
+                    onClick={() => handleDeleteAllTeams}
                     isLoading={isClicked}
                     loadingText={isClicked && "Deleting"}
                     variant={isClicked ? "outline" : "solid"}
