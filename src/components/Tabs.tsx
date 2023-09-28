@@ -1,51 +1,40 @@
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import { useState } from "react";
+import { ReceivedData } from "../Utils/interfaces";
+import { CurrentClash } from "./CurrentClash";
+import { ImportTeamsPage } from "./ImportTeamsPage";
 import { LandingPage } from "./LandingPage";
 import { TeamBuilderPage } from "./TeamBuilderPage";
-import { ImportTeamsPage } from "./ImportTeamsPage";
-import { useState } from "react";
-export interface ReceivedData {
-    id: number;
-    teamname: string;
-    teamcaptain: string;
-    teamplayer1: string;
-    teamplayer2: string;
-    teamplayer3: string;
-    teamplayer4: string;
-    teamplayer5: string;
-    teamplayer6: string;
-}
 
 export function TabsView(): JSX.Element {
     const [teamOptions, setTeamOptions] = useState<ReceivedData[]>([]);
 
     return (
-        <div>
-            <Tabs size="md">
-                <TabList>
-                    <Tab>Home</Tab>
-                    <Tab>Import teams</Tab>
-                    <Tab>Team Builder</Tab>
-                    <Tab>Current Clash</Tab>
-                </TabList>
+        <Tabs size="lg" align="end" variant="unstyled">
+            <TabList mr={"5rem"} pt={"1rem"}>
+                <Tab mr={"5rem"}>Home</Tab>
+                <Tab mr={"5rem"}>Import teams</Tab>
+                <Tab mr={"5rem"}>Team Builder</Tab>
+                <Tab mr={"5rem"}>Current Clash</Tab>
+            </TabList>
 
-                <TabPanels>
-                    <TabPanel>
-                        <LandingPage />
-                    </TabPanel>
-                    <TabPanel>
-                        <ImportTeamsPage
-                            teamOptions={teamOptions}
-                            setTeamOptions={setTeamOptions}
-                        />
-                    </TabPanel>
-                    <TabPanel>
-                        <TeamBuilderPage teamOptions={teamOptions} />
-                    </TabPanel>
-                    <TabPanel>
-                        <p>three!</p>
-                    </TabPanel>
-                </TabPanels>
-            </Tabs>
-        </div>
+            <TabPanels>
+                <TabPanel>
+                    <LandingPage />
+                </TabPanel>
+                <TabPanel>
+                    <ImportTeamsPage
+                        teamOptions={teamOptions}
+                        setTeamOptions={setTeamOptions}
+                    />
+                </TabPanel>
+                <TabPanel>
+                    <TeamBuilderPage teamOptions={teamOptions} />
+                </TabPanel>
+                <TabPanel>
+                    <CurrentClash />
+                </TabPanel>
+            </TabPanels>
+        </Tabs>
     );
 }

@@ -18,7 +18,7 @@ import Papa from "papaparse";
 import { useEffect, useState } from "react";
 import { baseUrl } from "../Utils/baseURL";
 import { fetchAllTeams } from "../fetchAllTeams";
-import { ReceivedData } from "./Tabs";
+import { ReceivedData } from "../Utils/interfaces";
 
 interface Data {
     teamname: string;

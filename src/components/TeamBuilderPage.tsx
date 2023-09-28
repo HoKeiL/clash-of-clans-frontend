@@ -1,38 +1,31 @@
-import {
-    Box,
-    Button,
-    Container,
-    Divider,
-    Select,
-    Text,
-} from "@chakra-ui/react";
+import { Box, Container, Divider, Select, Text } from "@chakra-ui/react";
 import { useState } from "react";
+import { ReceivedData } from "../Utils/interfaces";
 import { DisplayTeamPlayers } from "./DisplayTeamPlayers";
-import { ReceivedData } from "./Tabs";
 
-interface teamBuilderProps {
+export interface teamBuilderProps {
     teamOptions: ReceivedData[];
 }
 
-export function TeamBuilderPage({
-    teamOptions,
-}: teamBuilderProps): JSX.Element {
+export function TeamBuilderPage(props: teamBuilderProps): JSX.Element {
+    const { teamOptions } = props;
     const [chosenTeam, setChosenTeam] = useState<ReceivedData[]>();
     const [teamPlayers, setTeamPlayers] = useState<string[]>([]);
 
     function handleChosenTeam(event: React.ChangeEvent<HTMLSelectElement>) {
         const value = parseInt(event.target.value);
         const team = teamOptions.filter((x) => x.id === value);
-        const valueArray = Object.values(team[0]);
-        const playersOnlyArray = valueArray.slice(2);
+        const playersOnlyArray = Object.values(team[0]).slice(2);
+
         setChosenTeam(team);
         setTeamPlayers(playersOnlyArray);
     }
 
     return (
-        <Container>
+        <Container minWidth={"100vw"} minHeight={"100vh"} bg={"#FBFEFD"}>
             <Box>
                 <Select
+                    m={"1em auto"}
                     placeholder="Select teams"
                     onChange={(event) => {
                         handleChosenTeam(event);
@@ -61,14 +54,6 @@ export function TeamBuilderPage({
                     <Text textAlign="center">Order of play</Text>
 
                     <DisplayTeamPlayers teamPlayers={teamPlayers} />
-                    <DisplayTeamPlayers teamPlayers={teamPlayers} />
-                    <DisplayTeamPlayers teamPlayers={teamPlayers} />
-                    <DisplayTeamPlayers teamPlayers={teamPlayers} />
-                    <DisplayTeamPlayers teamPlayers={teamPlayers} />
-                    <DisplayTeamPlayers teamPlayers={teamPlayers} />
-                    <DisplayTeamPlayers teamPlayers={teamPlayers} />
-
-                    <Button ml="10em">Check my team</Button>
                 </Box>
             )}
         </Container>
