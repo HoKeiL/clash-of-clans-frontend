@@ -61,7 +61,7 @@ export function ImportTeamsPage({
     }
 
     function generateTeam(i: number) {
-        const eachTeamArray = allTeams[i].map((element)=>element);
+        const eachTeamArray = allTeams[i].map((element) => element);
         const dataObject = {
             teamname: eachTeamArray[0],
             teamcaptain: eachTeamArray[1],
@@ -70,7 +70,7 @@ export function ImportTeamsPage({
             teamplayer3: eachTeamArray[4],
             teamplayer4: eachTeamArray[5],
             teamplayer5: eachTeamArray[6],
-            teamplayer6: eachTeamArray[7]
+            teamplayer6: eachTeamArray[7],
         };
         return dataObject;
     }
