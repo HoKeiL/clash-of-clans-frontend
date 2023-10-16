@@ -20,7 +20,7 @@ import Papa from "papaparse";
 import { useState } from "react";
 import { fetchAllTeams } from "../fetchAllTeams";
 import { baseUrl } from "../Utils/baseURL";
-import { Data, ReceivedData } from "../Utils/interfaces";
+import { ReceivedData } from "../Utils/interfaces";
 
 interface importTeamViewProps {
     teamOptions: ReceivedData[];
@@ -31,9 +31,8 @@ export function ImportTeamsPage({
     teamOptions,
     setTeamOptions,
 }: importTeamViewProps): JSX.Element {
-    //State to store table Column name
-    const [allTeams, setAllteams] = useState<[Data][]>([]);
-    const [columnName, setColumnName] = useState<string[] | [Data]>([]);
+    const [allTeams, setAllteams] = useState<[string][]>([]);
+    const [columnName, setColumnName] = useState<string[]>([]);
 
     const [isClicked, setIsClicked] = useState(false);
 
@@ -41,11 +40,10 @@ export function ImportTeamsPage({
         // Passing file data (event.target.files[0]) to parse using Papa.parse
         const file = e.target.files![0];
         Papa.parse(file, {
-            complete: function (results: Papa.ParseResult<[Data]>) {
+            complete: function (results: Papa.ParseResult<[string]>) {
                 setAllteams(results.data.slice(1));
-                console.log("Data: " + results.data[0]);
-
                 setColumnName(results.data[0]);
+                console.log(results.data);
             },
         });
     }
