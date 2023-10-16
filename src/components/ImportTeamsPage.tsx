@@ -1,6 +1,9 @@
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 import {
+    Box,
     Button,
+    Divider,
+    Heading,
     Input,
     List,
     ListItem,
@@ -8,7 +11,6 @@ import {
     TableContainer,
     Tbody,
     Td,
-    Text,
     Th,
     Thead,
     Tr,
@@ -83,62 +85,73 @@ export function ImportTeamsPage({
         setIsClicked(false);
     }
     return (
-        <div>
+        <Box>
             <Input
                 type="file"
                 accept=".csv"
                 onChange={handleUploadCSV}
                 margin={"1em"}
-                variant="flushed"
+                variant="unstyled"
             />
-            <div>
-                <TableContainer marginTop={"1em"}>
-                    <Table>
-                        <Thead>
-                            {columnName.map((eachColumnName, index) => (
-                                <Th key={index}>{eachColumnName}</Th>
-                            ))}
-                        </Thead>
-                        <Tbody>
-                            {allTeams.map((eachTeam, index) => (
-                                <Tr key={index}>
-                                    {eachTeam.map((value, index) => (
-                                        <Td key={index}>{value}</Td>
-                                    ))}
-                                </Tr>
-                            ))}
-                        </Tbody>
-                    </Table>
-                </TableContainer>
-                <Button
-                    margin={"1em"}
-                    rightIcon={<ArrowForwardIcon />}
-                    onClick={handleSumbitAllTeam}
-                    isLoading={isClicked}
-                    loadingText={isClicked && "Submitting"}
-                    variant={isClicked ? "outline" : "solid"}
-                    isDisabled={teamOptions.length > 0}
-                >
-                    Submit Teams
-                </Button>
-            </div>
-            <Text margin={"1em"}>Currently uploaded teams: </Text>
-            <List margin={"1em"}>
-                {teamOptions.map((team) => (
-                    <ListItem key={team.id}>{team.teamname}</ListItem>
-                ))}
-            </List>
-            {teamOptions.length > 0 && (
-                <Button
-                    margin={"1em"}
-                    onClick={handleDeleteAllTeams}
-                    isLoading={isClicked}
-                    loadingText={isClicked && "Deleting"}
-                    variant={isClicked ? "outline" : "solid"}
-                >
-                    Delete
-                </Button>
-            )}
-        </div>
+            <Divider />
+
+            <TableContainer marginTop={"1em"}>
+                <Table>
+                    <Thead>
+                        {columnName.map((eachColumnName, index) => (
+                            <Th textAlign={"center"} key={index}>
+                                {eachColumnName}
+                            </Th>
+                        ))}
+                    </Thead>
+                    <Tbody>
+                        {allTeams.map((eachTeam, index) => (
+                            <Tr key={index}>
+                                {eachTeam.map((value, index) => (
+                                    <Td textAlign={"center"} key={index}>
+                                        {value}
+                                    </Td>
+                                ))}
+                            </Tr>
+                        ))}
+                    </Tbody>
+                </Table>
+            </TableContainer>
+            <Button
+                margin={"1em"}
+                rightIcon={<ArrowForwardIcon />}
+                onClick={handleSumbitAllTeam}
+                isLoading={isClicked}
+                loadingText={isClicked && "Submitting"}
+                variant={isClicked ? "outline" : "solid"}
+                isDisabled={teamOptions.length > 0}
+            >
+                Submit Teams
+            </Button>
+            <Box textAlign={"left"}>
+                <Heading margin={"0.5em"} fontSize={"lg"}>
+                    Currently uploaded teams:{" "}
+                </Heading>
+                <List margin={"1em"}>
+                    {teamOptions.map((team) => (
+                        <ListItem key={team.id} fontSize={"lg"}>
+                            {team.teamname}
+                        </ListItem>
+                    ))}
+                </List>
+
+                {teamOptions.length > 0 && (
+                    <Button
+                        margin={"0.5em"}
+                        onClick={handleDeleteAllTeams}
+                        isLoading={isClicked}
+                        loadingText={isClicked && "Deleting"}
+                        variant={isClicked ? "outline" : "solid"}
+                    >
+                        Delete
+                    </Button>
+                )}
+            </Box>
+        </Box>
     );
 }
