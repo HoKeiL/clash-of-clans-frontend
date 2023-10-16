@@ -10,13 +10,12 @@ import { TeamBuilderPage } from "./TeamBuilderPage";
 export function TabsView(): JSX.Element {
     const [teamOptions, setTeamOptions] = useState<ReceivedData[]>([]);
 
-    useEffect(()=>{
+    useEffect(() => {
         fetchAllTeams().then((uploadedTeams) => setTeamOptions(uploadedTeams));
-    },[])
+    }, []);
 
     return (
         <Tabs size="lg" align="end" variant="unstyled">
-           
             <TabList pt={"1rem"}>
                 <Tab mr={"5rem"}>Home</Tab>
                 <Tab mr={"5rem"}>Import teams</Tab>

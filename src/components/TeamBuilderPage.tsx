@@ -1,4 +1,11 @@
-import { Box, Container, Divider, Select, Text } from "@chakra-ui/react";
+import {
+    Box,
+    Container,
+    Divider,
+    Heading,
+    Select,
+    Text,
+} from "@chakra-ui/react";
 import { useState } from "react";
 import { ReceivedData } from "../Utils/interfaces";
 import { DisplayTeamPlayers } from "./DisplayTeamPlayers";
@@ -7,8 +14,9 @@ export interface teamBuilderProps {
     teamOptions: ReceivedData[];
 }
 
-export function TeamBuilderPage(props: teamBuilderProps): JSX.Element {
-    const { teamOptions } = props;
+export function TeamBuilderPage({
+    teamOptions,
+}: teamBuilderProps): JSX.Element {
     const [chosenTeam, setChosenTeam] = useState<ReceivedData[]>();
     const [teamPlayers, setTeamPlayers] = useState<string[]>([]);
 
@@ -22,9 +30,10 @@ export function TeamBuilderPage(props: teamBuilderProps): JSX.Element {
     }
 
     return (
-        <Container minWidth={"100vw"} minHeight={"100vh"} bg={"#FBFEFD"}>
+        <Container minHeight={"100vh"} bg={"#FBFEFD"}>
             <Box>
                 <Select
+                    minWidth={"30vw"}
                     m={"1em auto"}
                     placeholder="Select teams"
                     onChange={(event) => {
@@ -45,13 +54,16 @@ export function TeamBuilderPage(props: teamBuilderProps): JSX.Element {
                     border="1px"
                     borderRadius="16px"
                     borderColor="black"
+                    textAlign={"left"}
                 >
                     <Text m="1em">Team: {chosenTeam[0].teamname}</Text>
                     <Text m="1em">
                         Team Captain: {chosenTeam[0].teamcaptain}{" "}
                     </Text>
                     <Divider mt="1em" mb="1em" orientation="horizontal" />
-                    <Text textAlign="center">Order of play</Text>
+                    <Heading fontSize={"lg"} textAlign="center">
+                        Order of play
+                    </Heading>
 
                     <DisplayTeamPlayers teamPlayers={teamPlayers} />
                 </Box>
