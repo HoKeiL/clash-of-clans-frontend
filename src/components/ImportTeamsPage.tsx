@@ -15,21 +15,11 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import Papa from "papaparse";
-import { useEffect, useState } from "react";
-import { baseUrl } from "../Utils/baseURL";
+import { useState } from "react";
 import { fetchAllTeams } from "../fetchAllTeams";
-import { ReceivedData } from "../Utils/interfaces";
+import { baseUrl } from "../Utils/baseURL";
+import { Data, ReceivedData } from "../Utils/interfaces";
 
-interface Data {
-    teamname: string;
-    teamcaptain: string;
-    teamplayer1: string;
-    teamplayer2: string;
-    teamplayer3: string;
-    teamplayer4: string;
-    teamplayer5: string;
-    teamplayer6: string;
-}
 interface importTeamViewProps {
     teamOptions: ReceivedData[];
     setTeamOptions: React.Dispatch<React.SetStateAction<ReceivedData[]>>;
@@ -40,64 +30,56 @@ export function ImportTeamsPage({
     setTeamOptions,
 }: importTeamViewProps): JSX.Element {
     //State to store table Column name
-    const [columnName, setColumnName] = useState<string[]>([]);
-    //State to store the values
-    const [allTeams, setAllTeams] = useState<string[]>([]);
+    const [allTeams, setAllteams] = useState<[Data][]>([]);
+    const [columnName, setColumnName] = useState<string[] | [Data]>([]);
 
     const [isClicked, setIsClicked] = useState(false);
 
-    function handleUploadCSV(event) {
+    function handleUploadCSV(e: React.ChangeEvent<HTMLInputElement>) {
         // Passing file data (event.target.files[0]) to parse using Papa.parse
-        Papa.parse(event.target.files[0], {
-            header: true,
-            skipEmptyLines: true,
+        const file = e.target.files![0];
+        Papa.parse(file, {
             complete: function (results: Papa.ParseResult<[Data]>) {
-                const columnNameArray: string[] = [];
-                const teamsArray: string[] = [];
+                setAllteams(results.data.slice(1));
+                console.log("Data: " + results.data[0]);
 
-                // Iterating data to get column name and their values
-                results.data.map((d) => {
-                    columnNameArray.push(Object.keys(d));
-                    teamsArray.push(Object.values(d));
-                });
-
-                // Filtered Column Names
-                setColumnName(columnNameArray[0]);
-
-                // Filtered Values
-                setAllTeams(teamsArray);
+                setColumnName(results.data[0]);
             },
         });
     }
-
-    useEffect(() => {
-        fetchAllTeams().then((uploadedTeams) => setTeamOptions(uploadedTeams));
-    }, [isClicked === true, setTeamOptions]);
 
     async function handleSumbitAllTeam() {
         setIsClicked(true);
         for (let i = 0; i < allTeams.length; i++) {
             await axios.post(`${baseUrl}/teams`, generateTeam(i));
+            console.log("posted");
+            fetchAllTeams().then((uploadedTeams) =>
+                setTeamOptions(uploadedTeams)
+            );
         }
         setIsClicked(false);
     }
 
     function generateTeam(i: number) {
-        return {
-            teamname: allTeams[i][0],
-            teamcaptain: allTeams[i][1],
-            teamplayer1: allTeams[i][2],
-            teamplayer2: allTeams[i][3],
-            teamplayer3: allTeams[i][4],
-            teamplayer4: allTeams[i][5],
-            teamplayer5: allTeams[i][6],
-            teamplayer6: allTeams[i][7],
+        const eachTeamArray = allTeams[i].map((element)=>element);
+        const dataObject = {
+            teamname: eachTeamArray[0],
+            teamcaptain: eachTeamArray[1],
+            teamplayer1: eachTeamArray[2],
+            teamplayer2: eachTeamArray[3],
+            teamplayer3: eachTeamArray[4],
+            teamplayer4: eachTeamArray[5],
+            teamplayer5: eachTeamArray[6],
+            teamplayer6: eachTeamArray[7]
         };
+        return dataObject;
     }
 
     async function handleDeleteAllTeams() {
         setIsClicked(true);
         await axios.delete(`${baseUrl}/teams`);
+        fetchAllTeams().then((uploadedTeams) => setTeamOptions(uploadedTeams));
+        console.log("delete button clicked");
         setIsClicked(false);
     }
     return (
@@ -105,50 +87,41 @@ export function ImportTeamsPage({
             <Input
                 type="file"
                 accept=".csv"
-                onChange={() => handleUploadCSV}
+                onChange={handleUploadCSV}
                 margin={"1em"}
                 variant="flushed"
             />
-            {allTeams.length > 0 && (
-                <div>
-                    <TableContainer marginTop={"1em"}>
-                        <Table variant="simple">
-                            <Thead>
-                                <Tr>
-                                    {columnName.map((rows, index) => {
-                                        return <Th key={index}>{rows}</Th>;
-                                    })}
+            <div>
+                <TableContainer marginTop={"1em"}>
+                    <Table>
+                        <Thead>
+                            {columnName.map((eachColumnName, index) => (
+                                <Th key={index}>{eachColumnName}</Th>
+                            ))}
+                        </Thead>
+                        <Tbody>
+                            {allTeams.map((eachTeam, index) => (
+                                <Tr key={index}>
+                                    {eachTeam.map((value, index) => (
+                                        <Td key={index}>{value}</Td>
+                                    ))}
                                 </Tr>
-                            </Thead>
-                            <Tbody>
-                                {allTeams.map((value, index) => {
-                                    return (
-                                        <Tr key={index}>
-                                            {value.map((rowValues, index) => {
-                                                return (
-                                                    <Td key={index}>
-                                                        {rowValues}
-                                                    </Td>
-                                                );
-                                            })}
-                                        </Tr>
-                                    );
-                                })}
-                            </Tbody>
-                        </Table>
-                    </TableContainer>
-                    <Button
-                        margin={"1em"}
-                        rightIcon={<ArrowForwardIcon />}
-                        onClick={() => handleSumbitAllTeam}
-                        isLoading={isClicked}
-                        loadingText={isClicked && "Submitting"}
-                        variant={isClicked ? "outline" : "solid"}
-                    >
-                        Submit Teams
-                    </Button>
-                </div>
-            )}
+                            ))}
+                        </Tbody>
+                    </Table>
+                </TableContainer>
+                <Button
+                    margin={"1em"}
+                    rightIcon={<ArrowForwardIcon />}
+                    onClick={handleSumbitAllTeam}
+                    isLoading={isClicked}
+                    loadingText={isClicked && "Submitting"}
+                    variant={isClicked ? "outline" : "solid"}
+                    isDisabled={teamOptions.length > 0}
+                >
+                    Submit Teams
+                </Button>
+            </div>
             <Text margin={"1em"}>Currently uploaded teams: </Text>
             <List margin={"1em"}>
                 {teamOptions.map((team) => (
@@ -158,7 +131,7 @@ export function ImportTeamsPage({
             {teamOptions.length > 0 && (
                 <Button
                     margin={"1em"}
-                    onClick={() => handleDeleteAllTeams}
+                    onClick={handleDeleteAllTeams}
                     isLoading={isClicked}
                     loadingText={isClicked && "Deleting"}
                     variant={isClicked ? "outline" : "solid"}
