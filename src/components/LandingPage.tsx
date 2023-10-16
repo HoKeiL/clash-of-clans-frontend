@@ -39,6 +39,7 @@ export function LandingPage(): JSX.Element {
                     </Box>
                 </WrapItem>
             </Wrap>
+            <Text> Created by Ho Kei Leung</Text>
         </Container>
     );
 }
