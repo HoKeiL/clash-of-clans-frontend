@@ -1,5 +1,6 @@
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchAllTeams } from "../fetchAllTeams";
 import { ReceivedData } from "../Utils/interfaces";
 import { CurrentClash } from "./CurrentClash";
 import { ImportTeamsPage } from "./ImportTeamsPage";
@@ -9,9 +10,14 @@ import { TeamBuilderPage } from "./TeamBuilderPage";
 export function TabsView(): JSX.Element {
     const [teamOptions, setTeamOptions] = useState<ReceivedData[]>([]);
 
+    useEffect(()=>{
+        fetchAllTeams().then((uploadedTeams) => setTeamOptions(uploadedTeams));
+    },[])
+
     return (
         <Tabs size="lg" align="end" variant="unstyled">
-            <TabList mr={"5rem"} pt={"1rem"}>
+           
+            <TabList pt={"1rem"}>
                 <Tab mr={"5rem"}>Home</Tab>
                 <Tab mr={"5rem"}>Import teams</Tab>
                 <Tab mr={"5rem"}>Team Builder</Tab>
