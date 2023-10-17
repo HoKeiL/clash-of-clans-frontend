@@ -11,7 +11,7 @@ export function GenerateAlert({
 }: GenerateAlertViewProp): JSX.Element {
     return (
         <Box>
-            <Alert status={isPassed}>
+            <Alert minWidth={"30vw"} status={isPassed}>
                 <AlertIcon />
                 {message}
             </Alert>

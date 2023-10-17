@@ -14,10 +14,8 @@ export function PlayerSelect({
     return (
         <Select
             m={"0.5em"}
-            w={"50%"}
             value={selectedPlayer}
             onChange={(event) => handleSelectPlayer(event.target.value)}
-            isRequired
             placeholder="Select player"
         >
             {sortedPlayers.map((p) => (
