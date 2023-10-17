@@ -10,3 +10,13 @@ export async function fetchAllTeams() {
         console.log(error);
     }
 }
+
+export async function fetchAllPairings() {
+    try {
+        const response = await axios.get(`${baseUrl}/orderOfPlay`);
+        const result = response.data;
+        return result;
+    } catch (error) {
+        console.log(error);
+    }
+}
