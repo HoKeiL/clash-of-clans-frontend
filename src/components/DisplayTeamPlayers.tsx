@@ -1,30 +1,27 @@
-import { Box, Button, ListItem, OrderedList } from "@chakra-ui/react";
-import { useState } from "react";
-import { GenerateAlert } from "./GenerateAlert";
+import { Box, Button } from "@chakra-ui/react";
 import { PlayerSelect } from "./PlayerSelect";
+import { AlertMessages } from "./TeamBuilderPage";
 
 export type Player = string;
 interface DisplayTeamPlayerProps {
     teamPlayers: string[];
+    setIsPassed: React.Dispatch<
+        React.SetStateAction<"error" | "success" | undefined>
+    >;
+    setAlertMessage: React.Dispatch<
+        React.SetStateAction<AlertMessages | undefined>
+    >;
+    selectedPlayers: string[];
+    setSelectedPlayers: React.Dispatch<React.SetStateAction<string[]>>;
 }
-type AlertMessages =
-    | "error! Please fill in all pairings"
-    | "Please check if all players have been selected less than 3 times"
-    | "Please check if all players have been selected more than 2 times"
-    | "Please check all pairings are unique"
-    | "Please check if all individual pairing is unique"
-    | "success ";
+
 export function DisplayTeamPlayers({
     teamPlayers,
+    setIsPassed,
+    setAlertMessage,
+    selectedPlayers,
+    setSelectedPlayers,
 }: DisplayTeamPlayerProps): JSX.Element {
-    const [selectedPlayers, setSelectedPlayers] = useState<(Player | "")[]>(
-        createInitialEmptyPair(7)
-    );
-    const [isPassed, setIsPassed] = useState<"success" | "error" | undefined>();
-    const [alertMessage, setAlertMessage] = useState<
-        AlertMessages | undefined
-    >();
-
     function handleSelectPlayer(p: Player | "", givenPos: number) {
         setSelectedPlayers((prev) =>
             prev.map((other, ix) => (givenPos === ix ? p : other))
@@ -65,13 +62,6 @@ export function DisplayTeamPlayers({
         }
     }
 
-    function createInitialEmptyPair(numOfTeamPlayers: number): string[] {
-        const initialArray = [];
-        for (let i = 0; i < numOfTeamPlayers * 2; i++) {
-            initialArray.push("");
-        }
-        return initialArray;
-    }
     const pairIndices = [
         [0, 1],
         [2, 3],
@@ -106,34 +96,6 @@ export function DisplayTeamPlayers({
             >
                 Check my team
             </Button>
-            {isPassed === "error" && (
-                <GenerateAlert
-                    isPassed={isPassed}
-                    message={alertMessage}
-                    selectedPlayers={selectedPlayers}
-                />
-            )}
-            {isPassed === "success" && (
-                <>
-                    <GenerateAlert
-                        isPassed={isPassed}
-                        message={alertMessage}
-                        selectedPlayers={selectedPlayers}
-                    />
-                    <OrderedList>
-                        {getChunkedArray(selectedPlayers).map(
-                            (eachPair, index) => {
-                                return (
-                                    <ListItem key={index}>
-                                        {eachPair + ""}{" "}
-                                    </ListItem>
-                                );
-                            }
-                        )}
-                    </OrderedList>
-                    <Button>Ready to submit</Button>
-                </>
-            )}
         </Box>
     );
 }
@@ -207,7 +169,7 @@ function checkPlayerSelectionAtLeastTwice(arr: string[]): boolean {
 
 //below checks: same pair can not play twice
 
-function getChunkedArray(arr: string[]): string[][] {
+export function getChunkedArray(arr: string[]): string[][] {
     const chunkSize = 2;
     const newChunk = [];
     for (let i = 0; i < arr.length; i += chunkSize) {
