@@ -27,7 +27,7 @@ export function DisplayTeamPlayers({
             prev.map((other, ix) => (givenPos === ix ? p : other))
         );
     }
-    function handleSubmitOrderOfPlay() {
+    function handleCheckOrderOfPlay() {
         if (checkAllSelected(selectedPlayers) === false) {
             setIsPassed("error");
             setAlertMessage("error! Please fill in all pairings");
@@ -92,7 +92,7 @@ export function DisplayTeamPlayers({
             <Button
                 display={"block"}
                 m={"0.5em auto"}
-                onClick={handleSubmitOrderOfPlay}
+                onClick={handleCheckOrderOfPlay}
             >
                 Check my team
             </Button>
@@ -176,8 +176,6 @@ export function getChunkedArray(arr: string[]): string[][] {
         const chunk = arr.slice(i, i + chunkSize);
         newChunk.push(chunk);
     }
-    console.log("After Chunk: ", newChunk);
-
     return newChunk;
 }
 function isIndividualPairingUnique(arr: string[][]): boolean {
