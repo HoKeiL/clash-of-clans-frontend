@@ -10,7 +10,7 @@ export function PlayerSelect({
     selectedPlayer: undefined | Player;
     remainingPlayers: (Player | "")[];
 }) {
-    const sortedPlayers = remainingPlayers.sort();
+    const sortedPlayers = [...remainingPlayers].sort();
     return (
         <Select
             m={"0.5em"}
