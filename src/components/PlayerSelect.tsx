@@ -7,25 +7,24 @@ export function PlayerSelect({
     remainingPlayers,
 }: {
     handleSelectPlayer: (p: Player) => void;
-    selectedPlayer: null | Player;
+    selectedPlayer: undefined | Player;
     remainingPlayers: (Player | "")[];
 }) {
-    const sortedPlayers = [...remainingPlayers, selectedPlayer].sort();
+    const sortedPlayers = remainingPlayers.sort();
     return (
-        <div>
-            <Select
-                m={"0.5em"}
-                w={"50%"}
-                value={selectedPlayer}
-                onChange={(ev) => handleSelectPlayer(ev.target.value)}
-            >
-                <option value={""}> - </option>
-                {sortedPlayers.map((p) => (
-                    <option key={p} value={p}>
-                        {p}
-                    </option>
-                ))}
-            </Select>
-        </div>
+        <Select
+            m={"0.5em"}
+            w={"50%"}
+            value={selectedPlayer}
+            onChange={(event) => handleSelectPlayer(event.target.value)}
+            isRequired
+            placeholder="Select player"
+        >
+            {sortedPlayers.map((p) => (
+                <option key={p} value={p}>
+                    {p}
+                </option>
+            ))}
+        </Select>
     );
 }

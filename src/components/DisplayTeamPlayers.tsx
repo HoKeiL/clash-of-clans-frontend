@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { Alert, AlertIcon, Box, Button } from "@chakra-ui/react";
+import { useState } from "react";
 import { PlayerSelect } from "./PlayerSelect";
-import { Button } from "@chakra-ui/react";
 
 export type Player = string;
 interface DisplayTeamPlayerProps {
@@ -12,23 +12,28 @@ export function DisplayTeamPlayers({
     const [selectedPlayers, setSelectedPlayers] = useState<(Player | "")[]>(
         createInitialEmptyPair(7)
     );
+    const [isPassed, setIsPassed] = useState<"success" | "error">();
     function handleSelectPlayer(p: Player | "", givenPos: number) {
         setSelectedPlayers((prev) =>
             prev.map((other, ix) => (givenPos === ix ? p : other))
         );
     }
     function handleSubmitOrderOfPlay() {
-        console.log("handleSubmitOrderOfPlay");
-        if (selectedPlayers.some((p) => p === "")) {
-            alert("some slots have not been selected");
+        if (
+            selectedPlayers.some((p) => p === "") ||
+            checkPlayerSelection(selectedPlayers) === false
+        ) {
+            setIsPassed("error");
+            console.log("error");
         } else {
-            alert("OK - would submit here: " + JSON.stringify(selectedPlayers));
+            setIsPassed("success");
+            console.log("success");
         }
     }
 
     function createInitialEmptyPair(numOfTeamPlayers: number): string[] {
         const initialArray = [];
-        for (let i = 0; i < numOfTeamPlayers; i++) {
+        for (let i = 0; i < numOfTeamPlayers * 2; i++) {
             initialArray.push("");
         }
         return initialArray;
@@ -44,9 +49,9 @@ export function DisplayTeamPlayers({
     ];
 
     return (
-        <div>
+        <Box>
             {pairIndices.map(([i, j], gameIx) => (
-                <React.Fragment key={gameIx}>
+                <Box m={"1rem"} key={gameIx}>
                     {"Game: " + (gameIx + 1)}
                     {[i, j].map((index) => (
                         <PlayerSelect
@@ -55,25 +60,88 @@ export function DisplayTeamPlayers({
                                 handleSelectPlayer(player, index)
                             }
                             selectedPlayer={selectedPlayers[index]}
-                            remainingPlayers={subtract(
-                                teamPlayers,
-                                selectedPlayers
-                            )}
+                            remainingPlayers={teamPlayers}
                         />
                     ))}
-                </React.Fragment>
+                </Box>
             ))}
-            <Button ml="10em" onClick={handleSubmitOrderOfPlay}>
+            <Button
+                display={"block"}
+                m={"0.5em auto"}
+                onClick={handleSubmitOrderOfPlay}
+            >
                 Check my team
             </Button>
-        </div>
+            {isPassed === "error" && (
+                <Alert status="error">
+                    <AlertIcon />
+                    Please fill in all pairings!
+                </Alert>
+            )}
+            {isPassed === "success" && (
+                <Alert status="success">
+                    <AlertIcon />
+                    Will submit the following! {JSON.stringify(selectedPlayers)}
+                </Alert>
+            )}
+        </Box>
     );
 }
 
 // modify below function to check rules for team selection
-//same pair can not pley twice
+//same pair can not play twice
 //each player can not play more than 3 games
-//each player playat least 2 games
-function subtract(arr1: string[], arr2: string[]): string[] {
-    return arr1.filter((a1) => !arr2.includes(a1));
+//each player player least 2 games
+// function subtract(arr1: string[], arr2: string[]): string[] {
+//     return arr1.filter((a1) => !arr2.includes(a1));
+// }
+
+function checkPlayerSelection(arr: string[]): boolean {
+    // Create an object to store the count of each value in the array
+    let valueCount: { [x: string]: number };
+
+    // Count the occurrences of each value in the array
+    arr.forEach((value) => {
+        if (valueCount[value]) {
+            valueCount[value]++;
+        } else {
+            valueCount[value] = 1;
+        }
+    });
+    const selectedMoreThan3TimesArray = arr.filter(
+        (value) => valueCount[value] > 3
+    );
+    const selectedAtLeastTwiceArray = arr.filter(
+        (value) => valueCount[value] < 2
+    );
+
+    if (selectedMoreThan3TimesArray.length > 0) {
+        console.log(
+            "player selected for more than 3 times: " +
+                selectedMoreThan3TimesArray.filter(
+                    (value, index) =>
+                        selectedMoreThan3TimesArray.indexOf(value) === index
+                )
+        );
+        return false;
+    } else if (selectedAtLeastTwiceArray.length > 0) {
+        console.log(
+            "player has not selected at least twice: " +
+                selectedAtLeastTwiceArray
+        );
+        return false;
+    } else {
+        return true;
+    }
 }
+
+// function checkDuplicatePairings(arr: string[]): boolean {
+//     const chunkSize = 2;
+//     const newChunk = [];
+//     for (let i = 0; i < arr.length; i += chunkSize) {
+//         const chunk = arr.slice(i, i + chunkSize);
+//         newChunk.push(chunk);
+//     }
+
+//     console.log("After Chunk: ", newChunk);
+// }
