@@ -1,33 +1,67 @@
-import { Alert, AlertIcon, Box, Button } from "@chakra-ui/react";
+import { Box, Button, ListItem, OrderedList } from "@chakra-ui/react";
 import { useState } from "react";
+import { GenerateAlert } from "./GenerateAlert";
 import { PlayerSelect } from "./PlayerSelect";
 
 export type Player = string;
 interface DisplayTeamPlayerProps {
     teamPlayers: string[];
 }
+type AlertMessages =
+    | "error! Please fill in all pairings"
+    | "Please check if all players have been selected less than 3 times"
+    | "Please check if all players have been selected more than 2 times"
+    | "Please check all pairings are unique"
+    | "Please check if all individual pairing is unique"
+    | "success ";
 export function DisplayTeamPlayers({
     teamPlayers,
 }: DisplayTeamPlayerProps): JSX.Element {
     const [selectedPlayers, setSelectedPlayers] = useState<(Player | "")[]>(
         createInitialEmptyPair(7)
     );
-    const [isPassed, setIsPassed] = useState<"success" | "error">();
+    const [isPassed, setIsPassed] = useState<"success" | "error" | undefined>();
+    const [alertMessage, setAlertMessage] = useState<
+        AlertMessages | undefined
+    >();
+
     function handleSelectPlayer(p: Player | "", givenPos: number) {
         setSelectedPlayers((prev) =>
             prev.map((other, ix) => (givenPos === ix ? p : other))
         );
     }
     function handleSubmitOrderOfPlay() {
-        if (
-            selectedPlayers.some((p) => p === "") ||
-            checkPlayerSelection(selectedPlayers) === false
+        if (checkAllSelected(selectedPlayers) === false) {
+            setIsPassed("error");
+            setAlertMessage("error! Please fill in all pairings");
+        } else if (
+            isIndividualPairingUnique(getChunkedArray(selectedPlayers)) ===
+            false
         ) {
             setIsPassed("error");
-            console.log("error");
+            setAlertMessage("Please check if all individual pairing is unique");
+        } else if (
+            checkPlayerSelectionAtLeastTwice(selectedPlayers) === false
+        ) {
+            setIsPassed("error");
+            setAlertMessage(
+                "Please check if all players have been selected more than 2 times"
+            );
+        } else if (
+            checkPlayerSelectionLessThan3Times(selectedPlayers) === false
+        ) {
+            setIsPassed("error");
+            setAlertMessage(
+                "Please check if all players have been selected less than 3 times"
+            );
+        } else if (
+            isPlayerPairingUnique(getChunkedArray(selectedPlayers)) === false
+        ) {
+            setIsPassed("error");
+            setAlertMessage("Please check all pairings are unique");
         } else {
             setIsPassed("success");
-            console.log("success");
+            setAlertMessage("success ");
         }
     }
 
@@ -73,32 +107,49 @@ export function DisplayTeamPlayers({
                 Check my team
             </Button>
             {isPassed === "error" && (
-                <Alert status="error">
-                    <AlertIcon />
-                    Please fill in all pairings!
-                </Alert>
+                <GenerateAlert
+                    isPassed={isPassed}
+                    message={alertMessage}
+                    selectedPlayers={selectedPlayers}
+                />
             )}
             {isPassed === "success" && (
-                <Alert status="success">
-                    <AlertIcon />
-                    Will submit the following! {JSON.stringify(selectedPlayers)}
-                </Alert>
+                <>
+                    <GenerateAlert
+                        isPassed={isPassed}
+                        message={alertMessage}
+                        selectedPlayers={selectedPlayers}
+                    />
+                    <OrderedList>
+                        {getChunkedArray(selectedPlayers).map(
+                            (eachPair, index) => {
+                                return (
+                                    <ListItem key={index}>
+                                        {eachPair + ""}{" "}
+                                    </ListItem>
+                                );
+                            }
+                        )}
+                    </OrderedList>
+                    <Button>Ready to submit</Button>
+                </>
             )}
         </Box>
     );
 }
 
 // modify below function to check rules for team selection
-//same pair can not play twice
-//each player can not play more than 3 games
-//each player player least 2 games
-// function subtract(arr1: string[], arr2: string[]): string[] {
-//     return arr1.filter((a1) => !arr2.includes(a1));
-// }
 
-function checkPlayerSelection(arr: string[]): boolean {
+//below checks: if all pairings have been filled
+function checkAllSelected(arr: string[]): boolean {
+    if (arr.some((p) => p === "")) return false;
+    else return true;
+}
+//below checks: each player can not play more than 3 games
+
+function checkPlayerSelectionLessThan3Times(arr: string[]): boolean {
     // Create an object to store the count of each value in the array
-    let valueCount: { [x: string]: number };
+    const valueCount: { [x: string]: number } = {};
 
     // Count the occurrences of each value in the array
     arr.forEach((value) => {
@@ -111,9 +162,6 @@ function checkPlayerSelection(arr: string[]): boolean {
     const selectedMoreThan3TimesArray = arr.filter(
         (value) => valueCount[value] > 3
     );
-    const selectedAtLeastTwiceArray = arr.filter(
-        (value) => valueCount[value] < 2
-    );
 
     if (selectedMoreThan3TimesArray.length > 0) {
         console.log(
@@ -124,10 +172,32 @@ function checkPlayerSelection(arr: string[]): boolean {
                 )
         );
         return false;
-    } else if (selectedAtLeastTwiceArray.length > 0) {
+    } else {
+        return true;
+    }
+}
+
+//below checks: each player player least 2 games
+function checkPlayerSelectionAtLeastTwice(arr: string[]): boolean {
+    // Create an object to store the count of each value in the array
+    const valueCount: { [x: string]: number } = {};
+
+    // Count the occurrences of each value in the array
+    arr.forEach((value) => {
+        if (valueCount[value]) {
+            valueCount[value]++;
+        } else {
+            valueCount[value] = 1;
+        }
+    });
+    const selectedLessThanTwiceArray = arr.filter(
+        (value) => valueCount[value] < 2
+    );
+
+    if (selectedLessThanTwiceArray.length > 0) {
         console.log(
             "player has not selected at least twice: " +
-                selectedAtLeastTwiceArray
+                selectedLessThanTwiceArray
         );
         return false;
     } else {
@@ -135,13 +205,50 @@ function checkPlayerSelection(arr: string[]): boolean {
     }
 }
 
-// function checkDuplicatePairings(arr: string[]): boolean {
-//     const chunkSize = 2;
-//     const newChunk = [];
-//     for (let i = 0; i < arr.length; i += chunkSize) {
-//         const chunk = arr.slice(i, i + chunkSize);
-//         newChunk.push(chunk);
-//     }
+//below checks: same pair can not play twice
 
-//     console.log("After Chunk: ", newChunk);
-// }
+function getChunkedArray(arr: string[]): string[][] {
+    const chunkSize = 2;
+    const newChunk = [];
+    for (let i = 0; i < arr.length; i += chunkSize) {
+        const chunk = arr.slice(i, i + chunkSize);
+        newChunk.push(chunk);
+    }
+    console.log("After Chunk: ", newChunk);
+
+    return newChunk;
+}
+function isIndividualPairingUnique(arr: string[][]): boolean {
+    let result = false;
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i][0] !== arr[i][1]) result = true;
+        else return false;
+    }
+    return result;
+}
+
+function isPlayerPairingUnique(arr: string[][]): boolean {
+    let a: string[];
+    let b: string[];
+    let result = false;
+    for (let i = 0; i < arr.length - 1; i++) {
+        for (let j = i + 1; j < arr.length; j++) {
+            a = arr[i];
+            b = arr[j];
+            if (checkUniquePairings(a, b)) result = true;
+            else return result;
+        }
+    }
+    return result;
+}
+
+function checkUniquePairings(a: string[], b: string[]): boolean {
+    if (a.length !== b.length) return false;
+    const elements = new Set([...a, ...b]);
+    for (const x of elements) {
+        const count1 = a.filter((e) => e === x).length;
+        const count2 = b.filter((e) => e === x).length;
+        if (count1 !== count2) return true;
+    }
+    return false;
+}
