@@ -9,6 +9,7 @@ import {
     Select,
     Stack,
     Text,
+    UnorderedList,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { ReceivedData } from "../Utils/interfaces";
@@ -118,6 +119,24 @@ export function TeamBuilderPage({
                             textAlign={"left"}
                             alignItems={"flex-end"}
                         >
+                            <Heading fontSize={"x-large"} pl={"0.5em"}>
+                                Rules:{" "}
+                            </Heading>
+                            <UnorderedList mt={"1em"} mb={"1em"} pl={"1em"}>
+                                <ListItem pl={"1em"}>
+                                    All pairings must be filled
+                                </ListItem>
+                                <ListItem pl={"1em"}>
+                                    All players must play at least 2 games
+                                </ListItem>
+                                <ListItem pl={"1em"}>
+                                    No players can play more then 3 games
+                                </ListItem>
+                                <ListItem pl={"1em"}>
+                                    Same pairing can only play once in each
+                                    clans
+                                </ListItem>
+                            </UnorderedList>
                             {isPassed === "error" && (
                                 <GenerateAlert
                                     isPassed={isPassed}
