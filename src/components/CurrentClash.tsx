@@ -1,6 +1,7 @@
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import { useState } from "react";
 import { fetchAllPairings } from "../fetchAllTeams";
+import { getChunkedArray } from "./DisplayTeamPlayers";
 import { OrderOfPlayData } from "./TeamBuilderPage";
 
 interface ReceivedOrderOfPlayData extends OrderOfPlayData {
@@ -9,27 +10,44 @@ interface ReceivedOrderOfPlayData extends OrderOfPlayData {
 
 export function CurrentClash(): JSX.Element {
     const [allPairs, setAllPairs] = useState<ReceivedOrderOfPlayData[]>([]);
-    const [onlyPlayers, setOnlyPlayers] = useState<string[]>([]);
-    function hadleShowAllPairings() {
+    const [onlyPlayers, setOnlyPlayers] = useState<string[][]>([]);
+
+    function handleFetchAllPairings() {
         fetchAllPairings().then((uploadedPairs) => setAllPairs(uploadedPairs));
-        const playersOnly = Object.values(allPairs[0]).slice(2);
-        setOnlyPlayers(playersOnly);
+    }
+
+    function getOnlyPlayersArray(arr: ReceivedOrderOfPlayData) {
+        const playersOnly = Object.values(arr).slice(2);
+        const plyerPairing = getChunkedArray(playersOnly);
+        setOnlyPlayers(plyerPairing);
         console.log("onlyPlayers " + onlyPlayers);
+    }
+    function handleViewAllPairings() {
+        getOnlyPlayersArray(allPairs[0]);
     }
 
     return (
-        <div>
-            <Heading>Current Clash</Heading>
+        <Box textAlign={"left"}>
+            <Heading>Current Submited Pairings</Heading>
 
             {allPairs.length > 0 && (
-                <Box>
-                    <Heading>{allPairs[0].teamname}</Heading>
+                <Box mt={"1em"} ml={"1em"}>
+                    <Heading fontSize={"xl"}>
+                        {allPairs[0].teamname.toLocaleUpperCase()}
+                    </Heading>
                     {onlyPlayers.map((player, index) => (
-                        <Text key={index}>{player}</Text>
+                        <Text key={index}>{`Game ${
+                            index + 1
+                        }: ${player}`}</Text>
                     ))}
+                    <Button mt={"1em"} onClick={handleViewAllPairings}>
+                        View
+                    </Button>
                 </Box>
             )}
-            <Button onClick={hadleShowAllPairings}>show all pairings</Button>
-        </div>
+            <Button mt={"1em"} ml={"1em"} onClick={handleFetchAllPairings}>
+                Fetch
+            </Button>
+        </Box>
     );
 }
