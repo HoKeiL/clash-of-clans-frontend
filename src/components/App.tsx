@@ -1,10 +1,9 @@
-import { MyComponent } from "./MyComponent";
-import "./App.css";
+import { TabsView } from "./Tabs";
 
 function App() {
     return (
         <div className="App">
-            <MyComponent />
+            <TabsView />
         </div>
     );
 }
