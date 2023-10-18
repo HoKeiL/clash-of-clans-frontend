@@ -1,6 +1,8 @@
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
+import axios from "axios";
 import { useState } from "react";
 import { fetchAllPairings } from "../fetchAllTeams";
+import { baseUrl } from "../Utils/baseURL";
 import { getChunkedArray } from "./DisplayTeamPlayers";
 import { OrderOfPlayData } from "./TeamBuilderPage";
 
@@ -26,6 +28,11 @@ export function CurrentClash(): JSX.Element {
         getOnlyPlayersArray(allPairs[0]);
     }
 
+    async function handleDeleteAllPairings() {
+        await axios.delete(`${baseUrl}/orderOfPlay`);
+        handleFetchAllPairings();
+    }
+
     return (
         <Box textAlign={"left"}>
             <Heading>Current Submited Pairings</Heading>
@@ -47,6 +54,9 @@ export function CurrentClash(): JSX.Element {
             )}
             <Button mt={"1em"} ml={"1em"} onClick={handleFetchAllPairings}>
                 Fetch
+            </Button>
+            <Button mt={"1em"} ml={"1em"} onClick={handleDeleteAllPairings}>
+                Delete All
             </Button>
         </Box>
     );
